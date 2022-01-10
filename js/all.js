@@ -74,6 +74,12 @@ function handleItemCancel(currentItem) {
   votes.evaluations--
   currentItem.classList.remove('evaluating')
   setEvaluating(itemToCancel.item)
+  itemToCancel.item.style.animationDirection = 'reverse'
+  itemToCancel.item.classList.add(`moving_${itemToCancel.action}`)
+  setTimeout(() => {
+    itemToCancel.item.classList.remove(`moving_${itemToCancel.action}`)
+    itemToCancel.item.style.animationDirection = ''
+  }, 300)
   votes.voteStack.pop()
 }
 
