@@ -58,6 +58,7 @@ function handleItemAction(currentItem, actionType, timeout, nextItem) {
       currentItem.classList.remove(`moving_${actionType}`)
       setEvaluated(currentItem)
       setEvaluating(nextItem)
+      clearStamps()
     }, timeout)
   } else {
     currentItem.classList.remove(`moving_${actionType}`)
@@ -185,6 +186,16 @@ function touchMove(ev) {
     currentTranslateY = currentPosY - startPos.Y
     const movedX = currentTranslateX
     const movedY = currentTranslateY
+    if (movedY > 100) {
+      setStampOpacity(currentTranslateY, window.innerHeight, 'nothing')
+    } else {
+      if (movedX < -100) {
+        setStampOpacity(currentTranslateX, window.innerWidth, 'dislike')
+      }
+      if (movedX > 100) {
+        setStampOpacity(currentTranslateX, window.innerWidth, 'like')
+      }
+    }
   }
 }
 
@@ -209,6 +220,18 @@ function setFinalDirection(movedX, movedY) {
       triggerItemAction('like')
     }
   }
+}
+
+function clearStamps() {
+  currentItem.querySelectorAll('.stamp').forEach(stamp => {
+    stamp.style.opacity = '0'
+  })
+}
+
+function setStampOpacity(posOffset, windowAxis, actionType) {
+  clearStamps()
+  const opacity = ((Math.abs(posOffset) / windowAxis) * 100) + 20
+  currentItem.querySelector(`.stamp_${actionType}`).style.opacity = `${Math.floor(opacity)}%`
 }
 
 function animation() {
