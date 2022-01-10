@@ -1,3 +1,5 @@
+// IGNORING endRating class in favor of being able to cancel your vote even on the results page. Hope it's OK!
+// Otherwise I would have set the endRating class on body in processVotes()
 const FIRST_RATING_CLASS = 'firstRating',
   END_RATING_CLASS = 'endRating',
   EVALUATING_CLASS = 'evaluating';
@@ -31,6 +33,7 @@ function processVotes() {
         result.innerHTML = votes.like
         break
       case 'result_evaluated':
+        votes.evaluations = votes.like + votes.dislike
         result.innerHTML = votes.evaluations
         break
       case 'result_dislike':
@@ -45,7 +48,6 @@ function processVotes() {
 
 function handleItemAction(currentItem, actionType, timeout, nextItem) {
   votes[actionType]++
-  votes.evaluations++
   votes.voteStack.push({
     'action': actionType,
     'item': currentItem
@@ -105,7 +107,6 @@ function triggerItemAction(actionType) {
       default:
         break
     }
-
     if (nextItem.classList.contains('result')) {
       processVotes()
     }
@@ -115,7 +116,7 @@ function triggerItemAction(actionType) {
 }
 
 function cancelAllowed() {
-  if (votes.evaluations === 0) {
+  if (votes.voteStack.length === 0) {
     document.body.classList.add('firstRating')
   } else {
     document.body.classList.remove('firstRating')
