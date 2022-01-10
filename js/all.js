@@ -110,7 +110,7 @@ function triggerItemAction(actionType) {
       processVotes()
     }
   } else {
-    console.log('Already finished voting! Want to cancel?')
+    actionType === 'cancel' ? handleItemCancel(currentItem) : console.log('Finished voting! Did you mean to cancel?')
   }
 }
 
