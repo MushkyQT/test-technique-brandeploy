@@ -20,7 +20,7 @@ let votes = {
   'dislike': 0,
   'nothing': 0,
   'evaluations': 0,
-  'lastVote': null
+  'voteStack': []
 }
 
 function processVotes() {
@@ -45,8 +45,11 @@ function processVotes() {
 
 function handleItemAction(currentItem, actionType, timeout, nextItem) {
   votes[actionType]++
-  votes.lastVote = actionType
   votes.evaluations++
+  votes.voteStack.push({
+    'action': actionType,
+    'item': currentItem
+  })
   currentItem.classList.add(`moving_${actionType}`)
   if (timeout > 0) {
     setTimeout(() => {
@@ -61,7 +64,17 @@ function handleItemAction(currentItem, actionType, timeout, nextItem) {
   }
   if (nextItem.classList.contains('result')) {
     console.log('Results time!')
+    console.log(votes.voteStack)
   }
+}
+
+function handleItemCancel(currentItem) {
+  let itemToCancel = votes.voteStack[votes.voteStack.length - 1]
+  votes[itemToCancel.action]--
+  votes.evaluations--
+  currentItem.classList.remove('evaluating')
+  setEvaluating(itemToCancel.item)
+  votes.voteStack.pop()
 }
 
 function triggerItemAction(actionType) {
@@ -81,7 +94,7 @@ function triggerItemAction(actionType) {
         handleItemAction(currentItem, actionType, 300, nextItem)
         break
       case 'cancel':
-        console.log('Handle cancel')
+        handleItemCancel(currentItem)
         break
       default:
         break
