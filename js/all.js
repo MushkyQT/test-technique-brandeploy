@@ -64,7 +64,7 @@ function handleItemAction(currentItem, actionType, timeout, nextItem) {
   }
 }
 
-function triggerCardAction(actionType) {
+function triggerItemAction(actionType) {
   let filteredItems = filterEvaluatedItems()
   let currentItem = filteredItems[0]
   let nextItem = filteredItems[1]
@@ -95,12 +95,22 @@ function triggerCardAction(actionType) {
   }
 }
 
+function cancelAllowed() {
+  if (votes.evaluations === 0) {
+    document.body.classList.add('firstRating')
+  } else {
+    document.body.classList.remove('firstRating')
+  }
+}
+
 function checkClickTarget(e) {
   let target = e.target
   if (target.tagName === 'A') {
-    triggerCardAction(target.dataset.action)
+    triggerItemAction(target.dataset.action)
+    cancelAllowed()
   }
 }
 
 document.querySelector('nav').addEventListener('click', checkClickTarget)
 setEvaluating(items[0])
+cancelAllowed()
