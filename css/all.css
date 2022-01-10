@@ -1,0 +1,212 @@
+html {
+    --green: #73E6Bf;
+    --yellow: #F8BD37;
+    --red: #EB513A;
+    --blue: #42AAFD;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #f3f3f3;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    touch-action: none;
+}
+
+h1 {
+    background: #fff;
+    height: 50px;
+    line-height: 50px;
+    margin: 0;
+    text-align: center;
+}
+
+section {
+    position: relative;
+    height: calc(100vh - 50px);
+}
+
+article {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    margin: 10px;
+    width: calc(100vw - 20px);
+    max-width: 400px;
+    box-shadow: 0 0 5px 0px #000000;
+    box-sizing: border-box;
+}
+
+.item img {
+    max-width: 100%;
+    height: auto;
+}
+
+.item h2,
+.item p {
+    margin: 0 10px;
+}
+
+.item p {
+    margin-bottom: 5px;
+}
+
+.moving_like .stamps .stamp_like,
+.moving_dislike .stamps .stamp_dislike,
+.moving_nothing .stamps .stamp_nothing {
+    opacity: 1;
+}
+
+.moving_like {
+    animation: 300ms ease-in likeAnim;
+}
+
+@keyframes likeAnim {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(100vw, 0);
+    }
+}
+
+.moving_dislike {
+    animation: 300ms ease-in dislikeAnim;
+}
+
+@keyframes dislikeAnim {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(-100vw, 0);
+    }
+}
+
+.moving_nothing {
+    animation: 300ms ease-in nothingAnim;
+}
+
+@keyframes nothingAnim {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(0, 100vh);
+    }
+}
+
+
+.result .item {
+    padding: 10px;
+}
+
+article.evaluating,
+article.evaluating+article {
+    display: flex;
+}
+
+.stamps {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.stamps .stamp {
+    position: absolute;
+    top: 25px;
+    opacity: 0;
+    display: block;
+    border: 5px solid;
+    font-weight: bold;
+    font-size: 25px;
+    padding: 5px 10px;
+    transform: rotate(-10deg);
+}
+
+.stamps .stamp_like {
+    left: 15px;
+    color: var(--green);
+    border-color: var(--green);
+    transform: rotate(-10deg);
+}
+
+.stamps .stamp_dislike {
+    right: 15px;
+    color: var(--red);
+    transform: rotate(10deg);
+    border-color: var(--red);
+}
+
+.stamps .stamp_nothing {
+    left: 50%;
+    transform: translate(-50%, 0) rotate(-5deg);
+    color: var(--blue);
+    border-color: var(--blue);
+}
+
+nav {
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 2000;
+}
+
+body.endRating nav {
+    display: none;
+}
+
+nav a {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 30px;
+    font-weight: bold;
+    background: #fff;
+    border-radius: 50%;
+    margin: 0 10px;
+}
+
+nav a.cancel {
+    color: var(--yellow);
+}
+
+nav a.like {
+    color: var(--green);
+}
+
+nav a.dislike {
+    color: var(--red);
+}
+
+nav a.nothing {
+    color: var(--blue);
+}
+
+body.firstRating nav a.cancel {
+    opacity: 0.3;
+    pointer-events: none;
+}

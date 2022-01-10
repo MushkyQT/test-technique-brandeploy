@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Tinder like</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="css/all.css" rel="stylesheet"/>
+</head>
+<body>
+<h1>Tinder like</h1>
+<section>
+  <article style="z-index: 1000">
+    <div class="item">
+      <div class="stamps">
+        <div class="stamp stamp_like">Like</div>
+        <div class="stamp stamp_dislike">Dislike</div>
+        <div class="stamp stamp_nothing">Nothing</div>
+      </div>
+      <img src="img/001.jpg" alt="Saba, 25"/>
+      <h2>Phone, <span>10</span></h2>
+      <p>Cupertino</p>
+    </div>
+  </article>
+  <article style="z-index: 999">
+    <div class="item">
+      <div class="stamps">
+        <div class="stamp stamp_like">Like</div>
+        <div class="stamp stamp_dislike">Dislike</div>
+        <div class="stamp stamp_nothing">Nothing</div>
+      </div>
+      <img src="img/002.jpg" alt="Plantain, 28"/>
+      <h2>Computer, <span>48</span></h2>
+      <p>Massachusetts</p>
+    </div>
+  </article>
+  <article style="z-index: 998">
+    <div class="item">
+      <div class="stamps">
+        <div class="stamp stamp_like">Like</div>
+        <div class="stamp stamp_dislike">Dislike</div>
+        <div class="stamp stamp_nothing">Nothing</div>
+      </div>
+      <img src="img/003.jpg" alt="Plantain, 28"/>
+      <h2>Tablet, <span>7</span></h2>
+      <p>Las Vegas</p>
+    </div>
+  </article>
+  <article style="z-index: 997">
+    <div class="item">
+      <div class="stamps">
+        <div class="stamp stamp_like">Like</div>
+        <div class="stamp stamp_dislike">Dislike</div>
+        <div class="stamp stamp_nothing">Nothing</div>
+      </div>
+      <img src="img/004.jpg" alt="Plantain, 28"/>
+      <h2>Headphone, <span>57</span></h2>
+      <p>London</p>
+    </div>
+  </article>
+  <article class="result" style="z-index: 996">
+    <div class="item">
+      <span class="result_like">0</span> likes<br/>
+      <span class="result_evaluated">0</span> evaluated<br/>
+      <span class="result_dislike">0</span> dislikes<br/>
+      <span class="result_nothing">0</span> nothing<br/>
+    </div>
+  </article>
+</section>
+<nav>
+  <a href="#" class="cancel" data-action="cancel">C</a>
+  <a href="#" class="like" data-action="like">L</a>
+  <a href="#" class="dislike" data-action="dislike">D</a>
+  <a href="#" class="nothing" data-action="nothing">N</a>
+</nav>
+
+<script type="module" src="js/all.js"></script>
+</body>
+</html>
