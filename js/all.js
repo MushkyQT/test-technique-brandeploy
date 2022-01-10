@@ -113,6 +113,8 @@ function triggerItemAction(actionType) {
   } else {
     actionType === 'cancel' ? handleItemCancel(currentItem) : console.log('Finished voting! Did you mean to cancel?')
   }
+
+  cancelAllowed()
 }
 
 function cancelAllowed() {
@@ -127,7 +129,6 @@ function checkClickTarget(e) {
   let target = e.target
   if (target.tagName === 'A') {
     triggerItemAction(target.dataset.action)
-    cancelAllowed()
   }
 }
 
@@ -136,24 +137,24 @@ let isDragging = false,
   startPos = {},
   currentTranslateX = 0,
   currentTranslateY = 0,
-  prevTranslateX = 0,
-  prevTranslateY = 0,
   animationID = 0,
   currentItem = 0
 
-items.forEach((item, index) => {
-  item.addEventListener('dragstart', e => e.preventDefault())
+items.forEach(item => {
+  if (!item.classList.contains('result')) {
+    item.addEventListener('dragstart', e => e.preventDefault())
 
-  // Touch events
-  item.addEventListener('touchstart', touchStart(index))
-  item.addEventListener('touchend', touchEnd)
-  item.addEventListener('touchmove', touchMove)
+    // Touch events
+    item.addEventListener('touchstart', touchStart(item))
+    item.addEventListener('touchend', touchEnd)
+    item.addEventListener('touchmove', touchMove)
 
-  // Mouse event translations
-  item.addEventListener('mousedown', touchStart(index))
-  item.addEventListener('mouseup', touchEnd)
-  item.addEventListener('mousemove', touchMove)
-  item.addEventListener('mouseleave', touchEnd)
+    // Mouse event translations
+    item.addEventListener('mousedown', touchStart(item))
+    item.addEventListener('mouseup', touchEnd)
+    item.addEventListener('mousemove', touchMove)
+    item.addEventListener('mouseleave', touchEnd)
+  }
 })
 
 function getPosX(ev) {
@@ -180,16 +181,35 @@ function touchMove(ev) {
   if (isDragging) {
     const currentPosX = getPosX(ev)
     const currentPosY = getPosY(ev)
-    currentTranslateX = prevTranslateX + currentPosX - startPos.X
-    currentTranslateY = prevTranslateY + currentPosY - startPos.Y
+    currentTranslateX = currentPosX - startPos.X
+    currentTranslateY = currentPosY - startPos.Y
+    const movedX = currentTranslateX
+    const movedY = currentTranslateY
   }
 }
 
 function touchEnd() {
   cancelAnimationFrame(animationID)
   isDragging = false
+  const movedX = currentTranslateX
+  const movedY = currentTranslateY
+  currentTranslateY = 0
+  currentTranslateX = 0
+  setFinalDirection(movedX, movedY)
 }
 
+function setFinalDirection(movedX, movedY) {
+  if (movedY > 150) {
+    triggerItemAction('nothing')
+  } else {
+    if (movedX < -100) {
+      triggerItemAction('dislike')
+    }
+    if (movedX > 100) {
+      triggerItemAction('like')
+    }
+  }
+}
 
 function animation() {
   setItemPosition()
@@ -197,7 +217,7 @@ function animation() {
 }
 
 function setItemPosition() {
-  items[0].style.transform = `translateX(${currentTranslateX}px) translateY(${currentTranslateY}px)`
+  currentItem.style.transform = `translateX(${currentTranslateX}px) translateY(${currentTranslateY}px)`
 }
 
 // END TOUCH API
