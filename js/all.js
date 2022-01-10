@@ -4,18 +4,18 @@ const FIRST_RATING_CLASS = 'firstRating',
   END_RATING_CLASS = 'endRating',
   EVALUATING_CLASS = 'evaluating';
 
-const items = document.querySelectorAll('article')
-const filterEvaluatedItems = () => [...items].filter(item => !item.classList.contains('evaluated'))
-const setEvaluating = target => {
-  if (target.classList.length > 0) {
-    target.classList.remove('evaluated')
+const items = document.querySelectorAll('article'),
+  filterEvaluatedItems = () => [...items].filter(item => !item.classList.contains('evaluated')),
+  setEvaluating = target => {
+    if (target.classList.length > 0) {
+      target.classList.remove('evaluated')
+    }
+    target.classList.add('evaluating')
+  },
+  setEvaluated = target => {
+    target.classList.remove('evaluating')
+    target.classList.add('evaluated')
   }
-  target.classList.add('evaluating')
-}
-const setEvaluated = target => {
-  target.classList.remove('evaluating')
-  target.classList.add('evaluated')
-}
 
 let votes = {
   'like': 0,
@@ -131,6 +131,82 @@ function checkClickTarget(e) {
   }
 }
 
+// TOUCH API
+let isDragging = false,
+  startPos = {},
+  currentTranslateX = 0,
+  currentTranslateY = 0,
+  prevTranslateX = 0,
+  prevTranslateY = 0,
+  animationID = 0,
+  currentItem = 0
+
+items.forEach((item, index) => {
+  item.addEventListener('dragstart', e => e.preventDefault())
+
+  // Touch events
+  item.addEventListener('touchstart', touchStart(index))
+  item.addEventListener('touchend', touchEnd)
+  item.addEventListener('touchmove', touchMove)
+
+  // Mouse event translations
+  item.addEventListener('mousedown', touchStart(index))
+  item.addEventListener('mouseup', touchEnd)
+  item.addEventListener('mousemove', touchMove)
+  item.addEventListener('mouseleave', touchEnd)
+})
+
+function getPosX(ev) {
+  return ev.type.includes('mouse') ? ev.pageX : ev.touches[0].clientX
+}
+
+function getPosY(ev) {
+  return ev.type.includes('mouse') ? ev.pageY : ev.touches[0].clientY
+}
+
+function touchStart(item) {
+  return function (ev) {
+    isDragging = true
+    currentItem = item
+    startPos = {
+      'X': getPosX(ev),
+      'Y': getPosY(ev)
+    }
+    animationID = requestAnimationFrame(animation)
+  }
+}
+
+function touchMove(ev) {
+  if (isDragging) {
+    const currentPosX = getPosX(ev)
+    const currentPosY = getPosY(ev)
+    currentTranslateX = prevTranslateX + currentPosX - startPos.X
+    currentTranslateY = prevTranslateY + currentPosY - startPos.Y
+  }
+}
+
+function touchEnd() {
+  cancelAnimationFrame(animationID)
+  isDragging = false
+}
+
+
+function animation() {
+  setItemPosition()
+  if (isDragging) requestAnimationFrame(animation)
+}
+
+function setItemPosition() {
+  items[0].style.transform = `translateX(${currentTranslateX}px) translateY(${currentTranslateY}px)`
+}
+
+// END TOUCH API
+
+// Listen for clicks on action buttons
 document.querySelector('nav').addEventListener('click', checkClickTarget)
+
+// Set evaluating class on initial item
 setEvaluating(items[0])
+
+// Disable cancel button for initial item
 cancelAllowed()
