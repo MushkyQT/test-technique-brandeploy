@@ -4,6 +4,7 @@ const FIRST_RATING_CLASS = 'firstRating',
   END_RATING_CLASS = 'endRating',
   EVALUATING_CLASS = 'evaluating';
 
+// Define consts including function to fetch all items (articles) that are not evaluated
 const items = document.querySelectorAll('article'),
   filterEvaluatedItems = () => [...items].filter(item => !item.classList.contains('evaluated')),
   setEvaluating = target => {
@@ -22,9 +23,12 @@ let votes = {
   'dislike': 0,
   'nothing': 0,
   'evaluations': 0,
+  // voteStack is updated by handleItemAction() & handleItemCancel() for every vote
+  // and is used as a sort of 'history/state' for cancel functionality
   'voteStack': []
 }
 
+//------------------------------------START MAIN LOGIC---------------------------------------
 function processVotes() {
   const resultDisplays = document.querySelectorAll('.result span')
   resultDisplays.forEach(result => {
@@ -46,6 +50,7 @@ function processVotes() {
   })
 }
 
+// Handle animations, vote data, and display classes
 function handleItemAction(currentItem, actionType, timeout, nextItem) {
   votes[actionType]++
   votes.voteStack.push({
@@ -58,19 +63,16 @@ function handleItemAction(currentItem, actionType, timeout, nextItem) {
       currentItem.classList.remove(`moving_${actionType}`)
       setEvaluated(currentItem)
       setEvaluating(nextItem)
-      clearStamps()
+      clearStamps(currentItem)
     }, timeout)
   } else {
     currentItem.classList.remove(`moving_${actionType}`)
     setEvaluated(currentItem)
     setEvaluating(nextItem)
   }
-  if (nextItem.classList.contains('result')) {
-    console.log('Results time!')
-    console.log(votes.voteStack)
-  }
 }
 
+// Manage voteStack to handle vote cancellation by reverting to previous item in stack
 function handleItemCancel(currentItem) {
   let itemToCancel = votes.voteStack[votes.voteStack.length - 1]
   votes[itemToCancel.action]--
@@ -86,11 +88,14 @@ function handleItemCancel(currentItem) {
   votes.voteStack.pop()
 }
 
+// Handles actions received from function call in checkClickTarget()
+// and calls handleItemAction() with relevant data
 function triggerItemAction(actionType) {
   let filteredItems = filterEvaluatedItems()
   let currentItem = filteredItems[0]
   let nextItem = filteredItems[1]
 
+  // If the current item is NOT the results article, handle vote action
   if (!currentItem.classList.contains('result')) {
     switch (actionType) {
       case 'like':
@@ -108,16 +113,25 @@ function triggerItemAction(actionType) {
       default:
         break
     }
+    // If the next item IS the results article, call processVotes() to update results article HTML
     if (nextItem.classList.contains('result')) {
       processVotes()
     }
   } else {
+    // Handle cancelling from final results view
     actionType === 'cancel' ? handleItemCancel(currentItem) : console.log('Finished voting! Did you mean to cancel?')
   }
 
   cancelAllowed()
 }
 
+function clearStamps(item) {
+  item.querySelectorAll('.stamp').forEach(stamp => {
+    stamp.style.opacity = '0'
+  })
+}
+
+// Sets clickable state of vote nav 'cancel' button if not first vote in voteStack
 function cancelAllowed() {
   if (votes.voteStack.length === 0) {
     document.body.classList.add('firstRating')
@@ -126,6 +140,7 @@ function cancelAllowed() {
   }
 }
 
+// Handle clicks on nav elements and trigger relevant vote action
 function checkClickTarget(e) {
   let target = e.target
   if (target.tagName === 'A') {
@@ -133,7 +148,9 @@ function checkClickTarget(e) {
   }
 }
 
-// TOUCH API
+//------------------------------------END MAIN LOGIC---------------------------------------
+
+//------------------------------------START TOUCH API------------------------------------------
 let isDragging = false,
   startPos = {},
   currentTranslateX = 0,
@@ -141,6 +158,7 @@ let isDragging = false,
   animationID = 0,
   currentItem = 0
 
+// Create even listeners for touch events as well as their mouse API equivalents
 items.forEach(item => {
   if (!item.classList.contains('result')) {
     item.addEventListener('dragstart', e => e.preventDefault())
@@ -158,6 +176,7 @@ items.forEach(item => {
   }
 })
 
+// Get starting X and Y positions of cursor during drag for touch or mouse
 function getPosX(ev) {
   return ev.type.includes('mouse') ? ev.pageX : ev.touches[0].clientX
 }
@@ -178,6 +197,8 @@ function touchStart(item) {
   }
 }
 
+// Handle stamp opacity during drag based on currentTranslate X/Y and window width/height values
+// As well as update current values for use in touchEnd()
 function touchMove(ev) {
   if (isDragging) {
     const currentPosX = getPosX(ev)
@@ -199,6 +220,7 @@ function touchMove(ev) {
   }
 }
 
+// Call setFinalDirection() with final position values and reset said values for next item
 function touchEnd() {
   cancelAnimationFrame(animationID)
   isDragging = false
@@ -222,14 +244,8 @@ function setFinalDirection(movedX, movedY) {
   }
 }
 
-function clearStamps() {
-  currentItem.querySelectorAll('.stamp').forEach(stamp => {
-    stamp.style.opacity = '0'
-  })
-}
-
 function setStampOpacity(posOffset, windowAxis, actionType) {
-  clearStamps()
+  clearStamps(currentItem)
   const opacity = ((Math.abs(posOffset) / windowAxis) * 100) + 20
   currentItem.querySelector(`.stamp_${actionType}`).style.opacity = `${Math.floor(opacity)}%`
 }
@@ -243,7 +259,7 @@ function setItemPosition() {
   currentItem.style.transform = `translateX(${currentTranslateX}px) translateY(${currentTranslateY}px)`
 }
 
-// END TOUCH API
+//------------------------------------END TOUCH API------------------------------------------
 
 // Listen for clicks on action buttons
 document.querySelector('nav').addEventListener('click', checkClickTarget)
